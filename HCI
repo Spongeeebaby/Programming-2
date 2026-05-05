@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Altibo's Inventory System</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: linear-gradient(-45deg, #4facfe, #00f2fe, #0077cc, #4facfe);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+}
+
+/* Background animation */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    color: white;
+}
+
+/* CENTER LOGIN ONLY */
+.center-screen {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* LOGIN BOX (SQUARE) */
+.container {
+    width: 320px;
+    height: 320px;
+    padding: 25px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    text-align: center;
+    color: white;
+}
+
+/* MAIN CONTAINER */
+.main-container {
+    max-width: 900px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px;
+    margin-top: 10px;
+    width: 95%;
+    border: none;
+    border-radius: 5px;
+    background: #0077cc;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #005fa3;
+}
+
+.hidden {
+    display: none;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background: #4facfe;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Altibo's Inventory System</h1>
+</header>
+
+<!-- LOGIN -->
+<div class="center-screen" id="loginSection">
+    <div class="container">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="loginMsg"></p>
+    </div>
+</div>
+
+<!-- MAIN SYSTEM -->
+<div class="main-container hidden" id="mainMenu">
+    <h2>Inventory</h2>
+
+    <input type="text" id="itemName" placeholder="Item Name">
+    <input type="number" id="itemQty" placeholder="Quantity">
+    <button onclick="addItem()">Add Item</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="inventoryTable"></tbody>
+    </table>
+
+    <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+const correctUsername = "admin";
+const correctPassword = "1234";
+
+let inventory = [];
+let idCounter = 1;
+
+function login() {
+    let user = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
+
+    if (user === correctUsername && pass === correctPassword) {
+        document.getElementById("loginSection").classList.add("hidden");
+        document.getElementById("mainMenu").classList.remove("hidden");
+    } else {
+        document.getElementById("loginMsg").innerText = "Invalid login!";
+    }
+}
+
+function addItem() {
+    let name = document.getElementById("itemName").value;
+    let qty = document.getElementById("itemQty").value;
+
+    if (!name || !qty) {
+        alert("Please fill in all fields");
+        return;
+    }
+
+    inventory.push({
+        id: idCounter++,
+        name: name,
+        qty: qty
+    });
+
+    document.getElementById("itemName").value = "";
+    document.getElementById("itemQty").value = "";
+
+    display();
+}
+
+function deleteItem(id) {
+    inventory = inventory.filter(item => item.id !== id);
+    display();
+}
+
+function editItem(id) {
+    let item = inventory.find(i => i.id === id);
+
+    let newName = prompt("New name:", item.name);
+    let newQty = prompt("New quantity:", item.qty);
+
+    if (newName && newQty) {
+        item.name = newName;
+        item.qty = newQty;
+    }
+
+    display();
+}
+
+function display() {
+    let table = document.getElementById("inventoryTable");
+    table.innerHTML = "";
+
+    inventory.forEach(item => {
+        table.innerHTML += `
+        <tr>
+            <td>${item.id}</td>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>
+                <button onclick="editItem(${item.id})">Edit</button>
+                <button onclick="deleteItem(${item.id})">Delete</button>
+            </td>
+        </tr>`;
+    });
+}
+
+function logout() {
+    document.getElementById("mainMenu").classList.add("hidden");
+    document.getElementById("loginSection").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
